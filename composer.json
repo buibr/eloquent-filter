@@ -1,0 +1,22 @@
+{
+  "name": "buibr/eloquent-filter",
+  "description": "Search by filtering query string to eloquent query",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Burhan Ibrahimi",
+      "email": "mail@buib.me",
+      "homepage": "https://www.buib.me",
+      "role": "creator"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "laravel/framework": ">6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "BI\\EloquentFilter\\": ""
+    }
+  }
+}
