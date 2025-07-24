@@ -2,8 +2,8 @@
 
 namespace BI\EloquentFilter;
 
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 abstract class QueryFilter
 {
@@ -44,10 +44,35 @@ abstract class QueryFilter
                 continue;
             }
 
-            call_user_func_array([$this, $name], array_filter([$value]));
+            if (is_array($value) && empty($value)) {
+                continue;
+            }
+
+            // or:1234
+            if (is_string($value) && strpos(':', $value) !== false) {
+                $value = explode(':', $value);
+                $arguments = array_reverse($value);
+            } elseif (is_array($value) && !$this->is_assoc($value) && 'sort' !== $name) {
+                $key = $value['operator'] ?? 'and';
+                $value = $value['value'] ?? '';
+                $arguments = [$value, $key];
+            } else {
+                $arguments = [$value];
+            }
+
+            call_user_func_array([$this, $name], array_filter($arguments));
         }
 
         return $this->builder;
+    }
+
+    function is_assoc($array)
+    {
+        if (function_exists('array_is_list')) {
+            return !array_is_list($array);
+        }
+
+        return array_values($array) !== $array;
     }
 
     /**
