@@ -2,8 +2,6 @@
 
 namespace BI\EloquentFilter\Traits;
 
-use BI\EloquentFilter\Exceptions\FilterableColumnException;
-
 trait TimeRequestFilterTrait
 {
 
@@ -12,18 +10,9 @@ trait TimeRequestFilterTrait
     /**
      * @override
      */
-    public function getFilterDateColumn():string
+    public function getFilterDateColumn(): string
     {
         $filter = trim($this->filterDateColumn);
-
-        if(!$this->hasAttribute($filter)){
-            throw new FilterableColumnException('The column '.$filter.' does not exist in the model '.$this->builder->getModel()::class);
-        }
-
-        if(!$this->isFillable($filter)){
-            throw new FilterableColumnException('The column '.$filter.' is not fillable in the model '.$this->builder->getModel()::class);
-        }
-
         return $filter;
     }
 
@@ -61,7 +50,7 @@ trait TimeRequestFilterTrait
 
     public function today($today = true): void
     {
-        $this->builder->whereToday($this->getFilterDateColumn(), true);
+        $this->builder->where($this->getFilterDateColumn(), '>=', now()->startOfDay());
     }
 
     public function yesterday($yesterday = true): void
@@ -109,18 +98,21 @@ trait TimeRequestFilterTrait
         $end = now()->setMonth(3)->endOfMonth();
         $this->builder->whereBetween($this->getFilterDateColumn(), [$start, $end]);
     }
+
     public function secondQuarter(): void
     {
         $start = now()->setMonth(4)->startOfMonth();
         $end = now()->setMonth(6)->endOfMonth();
         $this->builder->whereBetween($this->getFilterDateColumn(), [$start, $end]);
     }
+
     public function thirdQuarter(): void
     {
         $start = now()->setMonth(7)->startOfMonth();
         $end = now()->setMonth(9)->endOfMonth();
         $this->builder->whereBetween($this->getFilterDateColumn(), [$start, $end]);
     }
+
     public function fourthQuarter(): void
     {
         $start = now()->setMonth(10)->startOfMonth();
