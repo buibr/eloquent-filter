@@ -4,6 +4,7 @@ namespace BI\EloquentFilter;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str as LrvStr;
 
 abstract class QueryFilter
 {
@@ -81,5 +82,42 @@ abstract class QueryFilter
     public function filters()
     {
         return $this->request->all();
+    }
+
+    /**
+     * sort by parameters
+     *
+     * example:
+     * ```
+     * public function sort_name($direction){
+     *     $this->builder->orderBy('name', $direction);
+     * }
+     * ```
+     *
+     * @param $sort
+     * @return Builder
+     */
+    public function sort($sort)
+    {
+        $keys = array_keys($sort);
+
+        foreach ($keys as $key) {
+            $methodKey = 'sort_' . $key;
+
+            if (method_exists($this, $methodKey)) {
+                $this->{'sort_' . $key}($sort[$key]);
+                continue;
+            }
+
+            if (method_exists($this, LrvStr::camel($methodKey))) {
+                $methodKey = LrvStr::camel($methodKey);
+                $this->{$methodKey}($sort[$key]);
+                continue;
+            }
+
+            $this->builder->orderBy($key, $sort[$key]);
+        }
+
+        return $this->builder;
     }
 }
